@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <!-- Made in Framer · framer.com ✨ -->
 <!-- Published Sep 19, 2026, 9:34 AM UTC -->
@@ -166,6 +166,43 @@
 </svg>
 <svg display="block" id="1171430842" role="presentation" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M 0 0 L 14.5 0" fill="transparent" height="1px" id="jMF44oNeb" stroke="var(--18mrqx2, rgb(0, 0, 0))" stroke-dasharray="" stroke-linecap="round" stroke-linejoin="round" stroke-width="var(--1335ju, 1.5)" transform="translate(4.75 5.75)" width="14.5px"></path><path d="M 0 0 L 14.5 0" fill="transparent" height="1px" id="lwuMFFtBI" stroke="var(--18mrqx2, rgb(0, 0, 0))" stroke-dasharray="" stroke-linecap="round" stroke-linejoin="round" stroke-width="var(--1335ju, 1.5)" transform="translate(4.75 18.25)" width="14.5px"></path><path d="M 0 0 L 14.5 0" fill="transparent" height="1px" id="KKxXbtl64" stroke="var(--18mrqx2, rgb(0, 0, 0))" stroke-dasharray="" stroke-linecap="round" stroke-linejoin="round" stroke-width="var(--1335ju, 1.5)" transform="translate(4.75 12)" width="14.5px"></path></svg>
 </div>
+<!-- ===== NAVBAR SCROLL COLOUR ===== -->
+<style>
+  /* At rest: solid footer colour */
+  .framer-jcswC {
+    background-color: #0c061e !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
+  }
+  /* Scrolled: blur glass */
+  .framer-jcswC.mcn-scrolled {
+    background-color: rgba(40, 21, 100, 0.55) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+</style>
+<script>
+(function () {
+  var ticking = false;
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(function () {
+        var scrolled = window.scrollY > 10;
+        document.querySelectorAll('.framer-jcswC').forEach(function (el) {
+          el.classList.toggle('mcn-scrolled', scrolled);
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll(); /* run once on load */
+})();
+</script>
+<!-- ===== END NAVBAR SCROLL COLOUR ===== -->
+
 <!-- Start of bodyEnd -->
 <!-- End of bodyEnd -->
 </body>
