@@ -194,6 +194,47 @@
 </script>
 <!-- ===== END NAVBAR SCROLL COLOUR ===== -->
 
+<!-- ===== CONSISTENT MARGINS ===== -->
+<style>
+/*
+  Align horizontal margins with the index.html pattern:
+  Desktop (>=1440px): 112px  |  Tablet (810-1439px): 48px  |  Mobile (<=809px): 24px
+*/
+
+/* ── Desktop: switch from 84% width to full width with 112px padding ── */
+.framer-sWEXg .framer-1rb9q1l {
+  width: 100% !important;
+  padding-left: 112px !important;
+  padding-right: 112px !important;
+  box-sizing: border-box !important;
+}
+
+/* ── Tablet: bring down from 64px to 48px ── */
+@media (min-width: 810px) and (max-width: 1439.98px) {
+  .framer-sWEXg .framer-1rb9q1l {
+    padding-left: 48px !important;
+    padding-right: 48px !important;
+  }
+  .framer-sWEXg .framer-1d09dzx {
+    padding-left: 48px !important;
+    padding-right: 48px !important;
+  }
+}
+
+/* ── Mobile: bring down from 32px to 24px ── */
+@media (max-width: 809.98px) {
+  .framer-sWEXg .framer-1rb9q1l {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+  .framer-sWEXg .framer-1d09dzx {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+</style>
+<!-- ===== END CONSISTENT MARGINS ===== -->
+
 <!-- Start of bodyEnd -->
 <!-- End of bodyEnd -->
 </body>

@@ -254,6 +254,31 @@
 </script>
 <!-- ===== END NAVBAR SCROLL COLOUR ===== -->
 
+<!-- ===== CONSISTENT MARGINS ===== -->
+<style>
+/*
+  Align horizontal margins with the index.html pattern:
+  Desktop (>=1440px): 112px  |  Tablet (810-1439px): 48px  |  Mobile (<=809px): 24px
+*/
+
+/* ── Desktop: switch from min-content width to full width with 112px padding ── */
+.framer-OLYeM .framer-1kwkpva {
+  width: 100% !important;
+  padding-left: 112px !important;
+  padding-right: 112px !important;
+  box-sizing: border-box !important;
+}
+
+/* ── Tablet: footer row missing override — fix to 48px ── */
+@media (min-width: 810px) and (max-width: 1439.98px) {
+  .framer-OLYeM .framer-pr49hf {
+    padding-left: 48px !important;
+    padding-right: 48px !important;
+  }
+}
+</style>
+<!-- ===== END CONSISTENT MARGINS ===== -->
+
 <!-- Start of bodyEnd -->
 <!-- End of bodyEnd -->
 
