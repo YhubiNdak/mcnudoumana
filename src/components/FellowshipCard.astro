@@ -1,0 +1,11 @@
+---
+import type { Fellowship } from '../data/fellowships';
+interface Props { fellowship: Fellowship; }
+const { fellowship } = Astro.props;
+---
+<article class="fellowship-card">
+  <a href={`/fellowships/${fellowship.slug}`} aria-label={`Learn about ${fellowship.name}`}>
+    <img src={fellowship.cardImage} alt={`${fellowship.name} at Methodist Church Nigeria, Udo Umana`} width="720" height="900" loading="lazy" />
+    <div class="fellowship-card-copy"><h2>{fellowship.name} <span aria-hidden="true">&gt;</span></h2></div>
+  </a>
+</article>

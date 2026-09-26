@@ -1,0 +1,8 @@
+---
+import { navItems, site } from '../data/site';
+---
+<footer class="site-footer"><div class="footer-inner">
+  <div class="footer-primary"><div class="footer-brand"><img src={site.logo} alt="Methodist Church Nigeria crest" width="70" height="70" loading="lazy" /><div><strong>{site.name}</strong><span>{site.branch}</span></div></div><nav class="footer-menu" aria-label="Footer navigation"><ul>{navItems.map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul></nav></div>
+  <div class="footer-follow"><h2>FOLLOW US</h2><div class="footer-contact"><div class="social-links"><a href={site.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">f</a><a href={site.youtube} target="_blank" rel="noreferrer" aria-label="YouTube">▶</a></div><a href={site.phoneHref}>{site.phoneDisplay}</a></div></div>
+  <p class="copyright">© 2026. Methodist Church Nigeria, 67 Udo Umana. All right reserved</p>
+</div></footer>

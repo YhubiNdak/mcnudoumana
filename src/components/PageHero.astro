@@ -1,0 +1,10 @@
+---
+interface Props { title: string; image: string; breadcrumb: string; }
+const { title, image, breadcrumb } = Astro.props;
+---
+<section class="page-hero" style={`--hero-image: url('${image}')`}>
+  <div class="container page-hero-content">
+    <h1>{title}</h1>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">▶</span><strong aria-current="page">{breadcrumb}</strong></nav>
+  </div>
+</section>

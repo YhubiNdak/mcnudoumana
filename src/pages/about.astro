@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { images } from '../data/site';
+const values = [
+  ['Scriptural Integrity', 'We are anchored in the timeless truths of the Bible.'],
+  ['Spirit-Filled Worship', 'We celebrate God with passion and reverence.'],
+  ['Compassionate Outreach', 'We believe the Church is called to be the hands and feet of Jesus in our local community.'],
+  ['Discipleship', 'We are committed to the continuous spiritual growth of every believer.'],
+];
+---
+<BaseLayout title="About Us" description="Discover the Wesleyan heritage, identity, worship, values and welcoming community of Methodist Church Nigeria at 67 Udo Umana Street, Uyo." image={images.aboutHero}>
+  <PageHero title="About Us: Methodist Church Nigeria, Udo Umana" breadcrumb="About" image={images.aboutHero} />
+  <nav class="about-tabs" aria-label="About pages"><a class="active" href="/about" aria-current="page">About Us</a><a href="/about/udoumana-history">Udo Umana History</a></nav>
+  <section class="flow-section"><div class="container about-flow"><div class="about-copy"><h2>Our Heritage & Identity</h2><p>Methodist Church Nigeria, located at 67 Udo Umana Street in the heart of Uyo, is a vibrant community of believers dedicated to the Wesleyan heritage of scriptural holiness and social reformation. As a prominent local assembly within the Methodist connection, we stand as a beacon of faith, hope, and love for the people of Akwa Ibom State.</p><h2>The Udo Umana Experience</h2><p>Worship at Udo Umana is a blend of sacred tradition and contemporary fervor. We are a “Home for All”—a place where families are strengthened, the youth are empowered, and the elderly are honored. Whether through our spirited Sunday services, midweek prayer encounters, or in our bible study classes, we strive to create an environment where the presence of God is tangible and life-changing.</p></div><div class="about-gold" aria-hidden="true"></div><div class="about-values"><h2>Our Core Values</h2><div class="values-list">{values.map(([title, copy]) => <p><strong>{title}:</strong><br />{copy}</p>)}</div></div><div class="about-reds" aria-hidden="true"><span></span><span></span></div><div class="about-connect"><h2>Connect With Us</h2><p>We invite you to join our journey of faith. Whether you are a lifelong Methodist or searching for a spiritual home in Uyo, our doors at 67 Udo Umana Street are open to you.</p></div></div></section>
+</BaseLayout>

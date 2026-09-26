@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import FellowshipGrid from '../../components/FellowshipGrid.astro';
+import { fellowships, type Fellowship } from '../../data/fellowships';
+import { images } from '../../data/site';
+export function getStaticPaths() { return fellowships.map((fellowship) => ({ params: { slug: fellowship.slug }, props: { fellowship } })); }
+interface Props { fellowship: Fellowship; }
+const { fellowship } = Astro.props;
+const detailImage = fellowship.detailImage ?? fellowship.cardImage;
+---
+<BaseLayout title={fellowship.name} description={`${fellowship.summary} Learn about ${fellowship.name} at Methodist Church Nigeria, Udo Umana.`} image={detailImage}>
+  <PageHero title="Fellowships: Methodist Church Nigeria, Udo Umana" breadcrumb="Fellowship" image={images.fellowshipsHero} />
+  <section class="fellowships-section"><div class="container"><div class="fellowships-intro"><h2>FELLOWSHIPS</h2><p>Find your place to serve, grow, and belong. Explore our fellowships and discover a community dedicated to spiritual growth and sharing the whole Gospel.</p></div><FellowshipGrid /></div></section>
+  <section class="detail-section"><div class="container fellowship-detail"><div class="detail-heading"><h2>{fellowship.name}</h2><a href="/fellowships" aria-label="Back to fellowships">×</a></div><img src={detailImage} alt={`${fellowship.name} at Methodist Church Nigeria, Udo Umana`} width="1216" height="760" loading="eager" /><div class="detail-copy"><p>{fellowship.summary}</p><ul>{fellowship.points.map((point) => <li>{point}</li>)}</ul>{fellowship.cta && <a class="text-link" href={fellowship.cta.href} target="_blank" rel="noreferrer">{fellowship.cta.label} →</a>}</div></div></section>
+</BaseLayout>

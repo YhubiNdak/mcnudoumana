@@ -1,0 +1,26 @@
+---
+import { navItems, site } from '../data/site';
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
+---
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="site-header" data-header>
+  <div class="topbar"><div class="utility-inner">
+    <a href={site.phoneHref} aria-label={`Call ${site.phoneDisplay}`}><span aria-hidden="true">☎</span> {site.phoneDisplay}</a>
+    <span class="topbar-location">{site.address}</span>
+    <span class="topbar-social"><a href={site.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">f</a><a href={site.youtube} target="_blank" rel="noreferrer" aria-label="YouTube">▶</a></span>
+  </div></div>
+  <div class="nav-shell"><div class="navbar">
+    <a class="brand" href="/" aria-label={`${site.name}, ${site.branch} — home`}><img src={site.logo} alt="Methodist Church Nigeria crest" width="58" height="58" /><span><strong>{site.name}</strong><small>{site.branch}</small></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="Open navigation menu"><span></span><span></span><span></span><b>Menu</b></button>
+    <nav id="site-navigation" class="site-nav" aria-label="Main navigation">{navItems.map((item) => <a href={item.href} class:list={{ active: isActive(item.href) }} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>)}<button class="give-control" type="button" disabled title="Online giving is not currently available">GIVE</button></nav>
+  </div></div>
+</header>
+<script is:inline>
+  const button = document.querySelector('.menu-toggle');
+  const nav = document.querySelector('#site-navigation');
+  const close = () => { button?.setAttribute('aria-expanded', 'false'); button?.setAttribute('aria-label', 'Open navigation menu'); nav?.classList.remove('open'); };
+  button?.addEventListener('click', () => { const open = button.getAttribute('aria-expanded') !== 'true'; button.setAttribute('aria-expanded', String(open)); button.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu'); nav?.classList.toggle('open', open); });
+  nav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', close));
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { close(); button?.focus(); } });
+</script>
