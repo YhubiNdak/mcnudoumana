@@ -320,7 +320,33 @@
     box-sizing: border-box !important;
     border-radius: 18px !important;
     overflow-y: auto !important;
-    max-height: 90vh !important;
+    height: min(620px, 90vh) !important;
+    max-height: none !important;
+  }
+
+  /* Remove carousel navigation arrows while keeping the close button. */
+  .framer-OLYeM .framer-1jxzaqq,
+  .framer-OLYeM .framer-1mf333k,
+  .framer-OLYeM .framer-12f9pz5,
+  .framer-OLYeM .framer-171n64z,
+  .framer-OLYeM .framer-1c11m9g,
+  .framer-OLYeM .framer-1svyvf3,
+  .framer-OLYeM .framer-10rq6hk {
+    display: none !important;
+  }
+
+  /* Remove carousel navigation arrows while keeping the close button. */
+  .framer-OLYeM .framer-1jxzaqq,
+  .framer-OLYeM .framer-1mf333k,
+  .framer-OLYeM .framer-12f9pz5,
+  .framer-OLYeM .framer-171n64z,
+  .framer-OLYeM .framer-1c11m9g,
+  .framer-OLYeM .framer-1svyvf3,
+  .framer-OLYeM .framer-10rq6hk {
+    display: none !important;
+  }
+  .framer-OLYeM [data-framer-component-type="SVG"][data-framer-name="material-symbols:play-arrow"] {
+    display: none !important;
   }
 
   /* Header row: title + close, no overflow */
