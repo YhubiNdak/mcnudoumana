@@ -29,11 +29,26 @@ class CleanURLRequestHandler(SimpleHTTPRequestHandler):
                 (parsed.scheme, parsed.netloc, html_route, parsed.query, parsed.fragment)
             )
 
+    def _disable_conditional_cache(self) -> None:
+        for header in ("If-Modified-Since", "If-None-Match"):
+            if header in self.headers:
+                del self.headers[header]
+
+    def end_headers(self) -> None:
+        self.send_header(
+            "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
+        )
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
+
     def do_GET(self) -> None:  # noqa: N802 - inherited HTTP handler API
+        self._disable_conditional_cache()
         self._resolve_clean_url()
         super().do_GET()
 
     def do_HEAD(self) -> None:  # noqa: N802 - inherited HTTP handler API
+        self._disable_conditional_cache()
         self._resolve_clean_url()
         super().do_HEAD()
 
