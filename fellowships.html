@@ -324,31 +324,6 @@
     max-height: none !important;
   }
 
-  /* Remove carousel navigation arrows while keeping the close button. */
-  .framer-OLYeM .framer-1jxzaqq,
-  .framer-OLYeM .framer-1mf333k,
-  .framer-OLYeM .framer-12f9pz5,
-  .framer-OLYeM .framer-171n64z,
-  .framer-OLYeM .framer-1c11m9g,
-  .framer-OLYeM .framer-1svyvf3,
-  .framer-OLYeM .framer-10rq6hk {
-    display: none !important;
-  }
-
-  /* Remove carousel navigation arrows while keeping the close button. */
-  .framer-OLYeM .framer-1jxzaqq,
-  .framer-OLYeM .framer-1mf333k,
-  .framer-OLYeM .framer-12f9pz5,
-  .framer-OLYeM .framer-171n64z,
-  .framer-OLYeM .framer-1c11m9g,
-  .framer-OLYeM .framer-1svyvf3,
-  .framer-OLYeM .framer-10rq6hk {
-    display: none !important;
-  }
-  .framer-OLYeM [data-framer-component-type="SVG"][data-framer-name="material-symbols:play-arrow"] {
-    display: none !important;
-  }
-
   /* Header row: title + close, no overflow */
   .framer-OLYeM .framer-1q2qkrv,
   .framer-OLYeM .framer-7mhu7i,
@@ -525,7 +500,43 @@
 })();
 </script>
 <!-- ===== END MOBILE FELLOWSHIP MODALS ===== -->
-->->
+
+<!-- ===== STABLE FELLOWSHIP MODAL OVERRIDES ===== -->
+<style>
+/* Apply modal sizing at every Framer breakpoint and both overlay mounts. */
+:is(#overlay, #template-overlay) .framer-OLYeM:is(
+  .framer-9p725i,
+  .framer-xp7qaf,
+  .framer-1rksgw9,
+  .framer-6vuz8k,
+  .framer-4yk0ky,
+  .framer-u6dyh8,
+  .framer-s6p78i,
+  .framer-kmed1e,
+  .framer-x50zh1
+) {
+  height: min(620px, calc(100dvh - 48px)) !important;
+  max-height: calc(100dvh - 48px) !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Each gallery frame contains the image plus exactly two arrow SVG controls. */
+:is(#overlay, #template-overlay) :is(
+  .framer-kvbqfo,
+  .framer-1qk9cgu,
+  .framer-19zm0j3,
+  .framer-14z3dal,
+  .framer-1pg5z36,
+  .framer-8mdjgq,
+  .framer-jtbdf5,
+  .framer-10q9s6e,
+  .framer-2lnqtv
+) > [data-framer-component-type="SVG"] {
+  display: none !important;
+}
+</style>
+<!-- ===== END STABLE FELLOWSHIP MODAL OVERRIDES ===== -->
 
 </body>
 </html>
