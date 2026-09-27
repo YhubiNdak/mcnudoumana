@@ -15,11 +15,7 @@
     const style = document.createElement("style");
     style.id = RESPONSIVE_STYLE_ID;
     style.textContent = `
-      html, body, #main { width: 100%; max-width: 100%; overflow-x: clip; }
-      img, picture, video, canvas, svg { max-width: 100%; }
-      [data-framer-component-type="RichTextContainer"],
-      [data-framer-component-type="Stack"] > * { min-width: 0; }
-      .framer-text { overflow-wrap: anywhere; }
+      .mcn-responsive-fallback :is(img, picture, video, canvas, svg) { max-width: 100%; }
 
       .framer-jcswC {
         background-color: #0c061e !important;
