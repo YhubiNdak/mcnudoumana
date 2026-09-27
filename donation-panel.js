@@ -85,39 +85,104 @@
     dialog.querySelector(".mcn-donation-close").focus();
   }
 
+  const giveNameSelector = '[data-framer-name="GIVE" i]';
+  const giveButtonSelector = '[data-framer-name="BTN"]';
+  const interactiveSelector = [
+    giveButtonSelector,
+    "a",
+    "button",
+    '[role="button"]',
+    '[data-highlight="true"]',
+    "[tabindex]",
+  ].join(",");
+  const menuControlSelector = [
+    ":is(#overlay, #template-overlay, .framer-jcswC)",
+    ':is(a, button, [role="button"], [data-highlight="true"], [tabindex])',
+  ].join(" ");
+
+  function isExactGiveLabel(element) {
+    return element?.textContent?.replace(/\s+/g, " ").trim().toUpperCase() === "GIVE";
+  }
+
   function findGiveTrigger(target) {
-    const label = target.closest?.('[data-framer-name="GIVE"]');
-    return label?.closest('[data-framer-name="BTN"]') || null;
+    if (!(target instanceof Element)) return null;
+
+    // Include the whole Framer button, not only clicks directly on its text.
+    const namedButton = target.closest(giveButtonSelector);
+    if (namedButton?.querySelector(giveNameSelector)) return namedButton;
+
+    // Support mobile menu clones that preserve the GIVE layer but not BTN.
+    const namedLabel = target.closest(giveNameSelector);
+    if (namedLabel) return namedLabel.closest(interactiveSelector) || namedLabel;
+
+    // Runtime menu portals are not present in the exported HTML. Match only an
+    // exact GIVE control inside the navbar or Framer's overlay mounts.
+    const menuControl = target.closest(menuControlSelector);
+    return isExactGiveLabel(menuControl) ? menuControl : null;
+  }
+
+  function decorateGiveTrigger(trigger) {
+    if (!trigger || trigger.dataset.donationBound === "true") return;
+
+    trigger.dataset.donationBound = "true";
+    if (!trigger.matches("a, button, input")) {
+      trigger.setAttribute("role", "button");
+      if (!trigger.hasAttribute("tabindex")) trigger.tabIndex = 0;
+    }
+    trigger.setAttribute("aria-haspopup", "dialog");
+    trigger.setAttribute("aria-label", "Give to support the mission");
   }
 
   function bindGiveTriggers() {
-    document.querySelectorAll('[data-framer-name="GIVE"]').forEach((label) => {
-      const trigger = label.closest('[data-framer-name="BTN"]');
-      if (!trigger) return;
-      trigger.dataset.donationBound = "true";
-      trigger.setAttribute("role", "button");
-      trigger.setAttribute("aria-haspopup", "dialog");
-      trigger.setAttribute("aria-label", "Give to support the mission");
+    const triggers = new Set();
+
+    document.querySelectorAll(giveNameSelector).forEach((label) => {
+      triggers.add(label.closest(interactiveSelector) || label);
     });
+
+    document.querySelectorAll(giveButtonSelector).forEach((button) => {
+      if (button.querySelector(giveNameSelector)) triggers.add(button);
+    });
+
+    document.querySelectorAll(menuControlSelector).forEach((control) => {
+      if (isExactGiveLabel(control)) triggers.add(control);
+    });
+
+    triggers.forEach(decorateGiveTrigger);
   }
 
-  document.addEventListener("click", (event) => {
+  function handleGiveClick(event) {
     const trigger = findGiveTrigger(event.target);
     if (!trigger) return;
-    event.preventDefault();
-    openDialog(trigger);
-  });
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    const trigger = findGiveTrigger(event.target) || event.target.closest?.('[data-framer-name="BTN"]');
-    if (!trigger?.querySelector('[data-framer-name="GIVE"]')) return;
     event.preventDefault();
+    event.stopImmediatePropagation();
+    decorateGiveTrigger(trigger);
     openDialog(trigger);
-  });
+  }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bindGiveTriggers, { once: true });
-  else bindGiveTriggers();
+  function handleGiveKeydown(event) {
+    if ((event.key !== "Enter" && event.key !== " ") || event.repeat) return;
+
+    const trigger = findGiveTrigger(event.target);
+    if (!trigger) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    decorateGiveTrigger(trigger);
+    openDialog(trigger);
+  }
+
+  // Capture runs before Framer's menu handlers can stop propagation or unmount
+  // the runtime menu clone. This delegate also covers future hydrated nodes.
+  document.addEventListener("click", handleGiveClick, { capture: true });
+  document.addEventListener("keydown", handleGiveKeydown, { capture: true });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindGiveTriggers, { once: true });
+  } else {
+    bindGiveTriggers();
+  }
 
   new MutationObserver(bindGiveTriggers).observe(document.documentElement, {
     childList: true,
