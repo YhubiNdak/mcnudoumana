@@ -11,8 +11,8 @@
       --color-primary: #333;
       --color-secondary: #888;
       --color-tint: #0099ff;
-      --font-size-body: 12px;
-      --font-size-title: 12px;
+      --font-size-body: 16px;
+      --font-size-title: clamp(28px, 8vw, 40px);
     }
     @font-face {
       font-family: Inter;
@@ -189,12 +189,12 @@
       box-sizing: border-box;
       font-family: "Inter", sans-serif;
       font-weight: 500;
-      max-width: 240px;
+      max-width: 520px;
       width: 100%;
       display: flex;
       align-items: center;
       flex-direction: column;
-      padding: 0 20px;
+      padding: 32px 24px;
       text-wrap: balance;
     }
 
@@ -219,13 +219,16 @@
     }
 
     .btn--back {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
       background-color: var(--color-tint);
       color: #ffffff;
-      padding-left: 8px;
-      padding-right: 8px;
+      padding: 8px 18px;
       border-radius: 8px;
-      line-height: 30px;
-      height: 30px;
+      font-size: 16px;
+      line-height: 1.25;
     }
 
     .btn--back:hover {

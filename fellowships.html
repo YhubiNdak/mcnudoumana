@@ -320,7 +320,7 @@
     box-sizing: border-box !important;
     border-radius: 18px !important;
     overflow-y: auto !important;
-    height: min(620px, 90vh) !important;
+    height: min(620px, calc(100dvh - 32px)) !important;
     max-height: none !important;
   }
 
@@ -368,7 +368,7 @@
     max-width: 100% !important;
   }
 
-  /* Close button: fixed 40x40, never squished */
+  /* Close button: touch-friendly and never squished */
   .framer-OLYeM .framer-j7jpp3,
   .framer-OLYeM .framer-yrzh15,
   .framer-OLYeM .framer-1jxzaqq,
@@ -378,10 +378,10 @@
   .framer-OLYeM .framer-1c11m9g,
   .framer-OLYeM .framer-1svyvf3,
   .framer-OLYeM .framer-10rq6hk {
-    flex: 0 0 40px !important;
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
   }
 
   /* Description text: full width, wraps, no clip */
