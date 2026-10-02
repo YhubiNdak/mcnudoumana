@@ -131,68 +131,9 @@
     dialog.querySelector(".mcn-donation-close").focus();
   }
 
-  const giveNameSelector = '[data-framer-name="GIVE" i]';
-  const giveButtonSelector = '[data-framer-name="BTN"]';
-  const interactiveSelector = [
-    astroTriggerSelector,
-    giveButtonSelector,
-    "a",
-    "button",
-    '[role="button"]',
-    '[data-highlight="true"]',
-    "[tabindex]",
-  ].join(",");
-  const menuControlSelector = [
-    ":is(#overlay, #template-overlay, .framer-jcswC)",
-    ':is(a, button, [role="button"], [data-highlight="true"], [tabindex])',
-  ].join(" ");
-
-  function isExactGiveLabel(element) {
-    return element?.textContent?.replace(/\s+/g, " ").trim().toUpperCase() === "GIVE";
-  }
-
   function findGiveTrigger(target) {
     if (!(target instanceof Element)) return null;
-
-    const astroTrigger = target.closest(astroTriggerSelector);
-    if (astroTrigger) return astroTrigger;
-
-    const namedButton = target.closest(giveButtonSelector);
-    if (namedButton?.querySelector(giveNameSelector)) return namedButton;
-
-    const namedLabel = target.closest(giveNameSelector);
-    if (namedLabel) return namedLabel.closest(interactiveSelector) || namedLabel;
-
-    const menuControl = target.closest(menuControlSelector);
-    return isExactGiveLabel(menuControl) ? menuControl : null;
-  }
-
-  function decorateGiveTrigger(trigger) {
-    if (!trigger || trigger.dataset.donationBound === "true") return;
-
-    trigger.dataset.donationBound = "true";
-    if (!trigger.matches("a, button, input")) {
-      trigger.setAttribute("role", "button");
-      if (!trigger.hasAttribute("tabindex")) trigger.tabIndex = 0;
-    }
-    trigger.setAttribute("aria-haspopup", "dialog");
-    trigger.setAttribute("aria-label", "Give to support the mission");
-  }
-
-  function bindGiveTriggers() {
-    const triggers = new Set(document.querySelectorAll(astroTriggerSelector));
-
-    document.querySelectorAll(giveNameSelector).forEach((label) => {
-      triggers.add(label.closest(interactiveSelector) || label);
-    });
-    document.querySelectorAll(giveButtonSelector).forEach((button) => {
-      if (button.querySelector(giveNameSelector)) triggers.add(button);
-    });
-    document.querySelectorAll(menuControlSelector).forEach((control) => {
-      if (isExactGiveLabel(control)) triggers.add(control);
-    });
-
-    triggers.forEach(decorateGiveTrigger);
+    return target.closest(astroTriggerSelector);
   }
 
   function handleGiveClick(event) {
@@ -200,34 +141,8 @@
     if (!trigger) return;
 
     event.preventDefault();
-    if (!trigger.matches(astroTriggerSelector)) event.stopImmediatePropagation();
-    decorateGiveTrigger(trigger);
     openDialog(trigger);
   }
 
-  function handleGiveKeydown(event) {
-    if ((event.key !== "Enter" && event.key !== " ") || event.repeat) return;
-
-    const trigger = findGiveTrigger(event.target);
-    if (!trigger || trigger.matches("button, a, input")) return;
-
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    decorateGiveTrigger(trigger);
-    openDialog(trigger);
-  }
-
-  document.addEventListener("click", handleGiveClick, { capture: true });
-  document.addEventListener("keydown", handleGiveKeydown, { capture: true });
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", bindGiveTriggers, { once: true });
-  } else {
-    bindGiveTriggers();
-  }
-
-  new MutationObserver(bindGiveTriggers).observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-  });
+  document.addEventListener("click", handleGiveClick);
 })();
