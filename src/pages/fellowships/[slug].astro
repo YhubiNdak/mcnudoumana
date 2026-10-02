@@ -4,13 +4,282 @@ import PageHero from '../../components/PageHero.astro';
 import FellowshipGrid from '../../components/FellowshipGrid.astro';
 import { fellowships, type Fellowship } from '../../data/fellowships';
 import { images } from '../../data/site';
-export function getStaticPaths() { return fellowships.map((fellowship) => ({ params: { slug: fellowship.slug }, props: { fellowship } })); }
-interface Props { fellowship: Fellowship; }
+
+export function getStaticPaths() {
+  return fellowships.map((fellowship) => ({
+    params: { slug: fellowship.slug },
+    props: { fellowship },
+  }));
+}
+
+interface Props {
+  fellowship: Fellowship;
+}
+
 const { fellowship } = Astro.props;
 const detailImage = fellowship.detailImage ?? fellowship.cardImage;
 ---
-<BaseLayout title={fellowship.name} description={`${fellowship.summary} Learn about ${fellowship.name} at Methodist Church Nigeria, Udo Umana.`} image={detailImage}>
-  <PageHero title="Fellowships: Methodist Church Nigeria, Udo Umana" breadcrumb="Fellowship" image={images.fellowshipsHero} />
-  <section class="fellowships-section"><div class="container"><div class="fellowships-intro"><h2>FELLOWSHIPS</h2><p>Find your place to serve, grow, and belong. Explore our fellowships and discover a community dedicated to spiritual growth and sharing the whole Gospel.</p></div><FellowshipGrid /></div></section>
-  <section class="detail-section"><div class="container fellowship-detail"><div class="detail-heading"><h2>{fellowship.name}</h2><a href="/fellowships" aria-label="Back to fellowships">×</a></div><img src={detailImage} alt={`${fellowship.name} at Methodist Church Nigeria, Udo Umana`} width="1216" height="760" loading="eager" /><div class="detail-copy"><p>{fellowship.summary}</p><ul>{fellowship.points.map((point) => <li>{point}</li>)}</ul>{fellowship.cta && <a class="text-link" href={fellowship.cta.href} target="_blank" rel="noreferrer">{fellowship.cta.label} →</a>}</div></div></section>
+
+<BaseLayout
+  title={fellowship.name}
+  description={`${fellowship.summary} Learn about ${fellowship.name} at Methodist Church Nigeria, Udo Umana.`}
+  image={detailImage}
+>
+  <PageHero
+    title="Fellowships: Methodist Church Nigeria, Udo Umana"
+    breadcrumb="Fellowship"
+    image={images.fellowshipsHero}
+  />
+
+  <section class="fellowships-section">
+    <div class="container">
+      <div class="fellowships-intro">
+        <h2>FELLOWSHIPS</h2>
+        <p>Find your place to serve, grow, and belong. Explore our fellowships and discover a community dedicated to spiritual growth and sharing the whole Gospel.</p>
+      </div>
+      <FellowshipGrid />
+    </div>
+  </section>
+
+  <dialog
+    id="fellowship-dialog"
+    class="detail-section"
+    open
+    aria-modal="true"
+    aria-labelledby="fellowship-dialog-title"
+  >
+    <div class="fellowship-detail">
+      <div class="detail-heading">
+        <h2 id="fellowship-dialog-title">{fellowship.name}</h2>
+        <a href="/fellowships" data-detail-close aria-label="Close fellowship details" autofocus>×</a>
+      </div>
+
+      <div class="detail-body">
+        <img
+          src={detailImage}
+          alt={`${fellowship.name} at Methodist Church Nigeria, Udo Umana`}
+          width="1216"
+          height="760"
+          loading="eager"
+        />
+        <div class="detail-copy">
+          <p>{fellowship.summary}</p>
+          <ul>{fellowship.points.map((point) => <li>{point}</li>)}</ul>
+          {fellowship.cta && (
+            <a class="text-link" href={fellowship.cta.href} target="_blank" rel="noreferrer">
+              {fellowship.cta.label} →
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  </dialog>
 </BaseLayout>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#fellowship-dialog');
+  const closeControl = dialog?.querySelector<HTMLAnchorElement>('[data-detail-close]');
+
+  if (dialog && closeControl) {
+    document.documentElement.classList.add('fellowship-modal-open');
+    document.body.classList.add('fellowship-modal-open');
+
+    if (typeof dialog.showModal === 'function') {
+      dialog.close();
+      dialog.showModal();
+    }
+    closeControl.focus();
+
+    let closing = false;
+    const closeDetails = () => {
+      if (closing) return;
+      closing = true;
+      if (dialog.open) dialog.close();
+      document.documentElement.classList.remove('fellowship-modal-open');
+      document.body.classList.remove('fellowship-modal-open');
+
+      let cameFromFellowships = false;
+      try {
+        const referrer = new URL(document.referrer);
+        cameFromFellowships =
+          referrer.origin === window.location.origin &&
+          referrer.pathname.replace(/\/$/, '') === '/fellowships';
+      } catch {
+        cameFromFellowships = false;
+      }
+
+      if (cameFromFellowships && history.length > 1) history.back();
+      else window.location.assign('/fellowships');
+    };
+
+    closeControl.addEventListener('click', (event) => {
+      event.preventDefault();
+      closeDetails();
+    });
+    dialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      closeDetails();
+    });
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) closeDetails();
+    });
+  }
+</script>
+
+<style>
+  :global(html:has(.detail-section[open])),
+  :global(body:has(.detail-section[open])),
+  :global(html.fellowship-modal-open),
+  :global(body.fellowship-modal-open) {
+    overflow: hidden;
+  }
+
+  .detail-section {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    display: grid;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: clamp(16px, 4vw, 40px);
+    place-items: center;
+    overflow: hidden;
+    border: 0;
+    background: rgba(12, 6, 30, .58);
+  }
+
+  .detail-section::backdrop {
+    background: transparent;
+  }
+
+  .fellowship-detail {
+    width: min(628px, 100%);
+    max-width: 628px;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+  }
+
+  .detail-heading {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 0;
+    padding: 24px 28px 18px;
+  }
+
+  .detail-heading h2 {
+    margin: 0;
+    font-size: 24px;
+    line-height: 31px;
+  }
+
+  .detail-heading a {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    place-items: center;
+    border-radius: 50%;
+    background: #e4e4e4;
+    color: #111;
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .detail-heading a:focus-visible,
+  .detail-copy a:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  .detail-body {
+    min-height: 0;
+    padding: 0 28px 28px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+
+  .detail-body > img {
+    width: 100%;
+    height: min(360px, 42dvh);
+    border-radius: 14px;
+    object-fit: cover;
+  }
+
+  .detail-copy {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-top: 28px;
+  }
+
+  .detail-copy > p {
+    margin: 0;
+    color: var(--grey);
+    font-size: 16px;
+    line-height: 25px;
+  }
+
+  .detail-copy ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .detail-copy li {
+    margin-bottom: 10px;
+    color: var(--grey);
+  }
+
+  .detail-copy .text-link {
+    color: var(--red);
+  }
+
+  @media (max-width: 809.98px) {
+    .detail-section {
+      padding: 14px;
+    }
+
+    .fellowship-detail {
+      width: 100%;
+      margin: 0;
+      border-radius: 18px;
+    }
+
+    .detail-heading {
+      padding: 20px 20px 14px;
+    }
+
+    .detail-heading h2 {
+      font-size: 20px;
+      line-height: 26px;
+    }
+
+    .detail-body {
+      padding: 0 20px 22px;
+    }
+
+    .detail-body > img {
+      height: min(300px, 38dvh);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail-section {
+      scroll-behavior: auto;
+    }
+  }
+</style>

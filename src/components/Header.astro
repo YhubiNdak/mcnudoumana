@@ -1,26 +1,458 @@
 ---
 import { navItems, site } from '../data/site';
+
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
-const isActive = (href: string) => href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
 ---
+
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="site-header" data-header>
-  <div class="topbar"><div class="utility-inner">
-    <a href={site.phoneHref} aria-label={`Call ${site.phoneDisplay}`}><span aria-hidden="true">☎</span> {site.phoneDisplay}</a>
-    <span class="topbar-location">{site.address}</span>
-    <span class="topbar-social"><a href={site.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">f</a><a href={site.youtube} target="_blank" rel="noreferrer" aria-label="YouTube">▶</a></span>
-  </div></div>
-  <div class="nav-shell"><div class="navbar">
-    <a class="brand" href="/" aria-label={`${site.name}, ${site.branch} — home`}><img src={site.logo} alt="Methodist Church Nigeria crest" width="58" height="58" /><span><strong>{site.name}</strong><small>{site.branch}</small></span></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="Open navigation menu"><span></span><span></span><span></span><b>Menu</b></button>
-    <nav id="site-navigation" class="site-nav" aria-label="Main navigation">{navItems.map((item) => <a href={item.href} class:list={{ active: isActive(item.href) }} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>)}<button class="give-control" type="button" disabled title="Online giving is not currently available">GIVE</button></nav>
-  </div></div>
+  <div class="topbar">
+    <div class="utility-inner">
+      <a class="utility-phone" href={site.phoneHref} aria-label={`Call ${site.phoneDisplay}`}>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2.1Z" /></svg>
+        <span>{site.phoneDisplay}</span>
+      </a>
+      <div class="utility-right">
+        <div class="topbar-social">
+          <a href={site.facebook} target="_blank" rel="noopener noreferrer" aria-label="Visit our Facebook page">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1877f2" /><path fill="#fff" d="M13.6 19v-6h2l.3-2.3h-2.3V9.2c0-.7.2-1.1 1.2-1.1H16V6c-.2 0-1-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.7H9.1V13h2.1v6h2.4Z" /></svg>
+          </a>
+          <a href={site.youtube} target="_blank" rel="noopener noreferrer" aria-label="Visit our YouTube channel">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="1" y="4.5" width="22" height="15" rx="4" fill="#ff0033" /><path fill="#fff" d="m10 9 5 3-5 3V9Z" /></svg>
+          </a>
+        </div>
+        <span class="topbar-location">{site.address}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-shell">
+    <div class="navbar">
+      <a class="brand" href="/" aria-label={`${site.name}, ${site.branch} — home`}>
+        <img src={site.logo} alt="" width="42" height="42" />
+        <span><strong>{site.name}</strong><small>{site.branch}</small></span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="Open navigation menu">
+        <span></span><span></span><span></span><b>Menu</b>
+      </button>
+
+      <div id="site-navigation" class="site-nav-panel">
+        <nav class="site-nav" aria-label="Main navigation">
+          {navItems.map((item) => (
+            <a href={item.href} class:list={{ active: isActive(item.href) }} aria-current={isActive(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        <button class="give-control" type="button" data-donation-trigger aria-haspopup="dialog">GIVE</button>
+      </div>
+    </div>
+  </div>
 </header>
-<script is:inline>
-  const button = document.querySelector('.menu-toggle');
-  const nav = document.querySelector('#site-navigation');
-  const close = () => { button?.setAttribute('aria-expanded', 'false'); button?.setAttribute('aria-label', 'Open navigation menu'); nav?.classList.remove('open'); };
-  button?.addEventListener('click', () => { const open = button.getAttribute('aria-expanded') !== 'true'; button.setAttribute('aria-expanded', String(open)); button.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu'); nav?.classList.toggle('open', open); });
-  nav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', close));
-  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { close(); button?.focus(); } });
+
+<script>
+  import '../../donation-config.js';
+  import '../../donation-panel.js';
+
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const menuButton = header?.querySelector<HTMLButtonElement>('.menu-toggle');
+  const panel = header?.querySelector<HTMLElement>('.site-nav-panel');
+  const topbar = header?.querySelector<HTMLElement>('.topbar');
+
+  if (header && menuButton && panel) {
+    const closeMenu = (restoreFocus = false) => {
+      if (!panel.classList.contains('open')) return;
+      menuButton.setAttribute('aria-expanded', 'false');
+      menuButton.setAttribute('aria-label', 'Open navigation menu');
+      panel.classList.remove('open');
+      if (restoreFocus) menuButton.focus();
+    };
+
+    menuButton.addEventListener('click', () => {
+      const willOpen = !panel.classList.contains('open');
+      panel.classList.toggle('open', willOpen);
+      menuButton.setAttribute('aria-expanded', String(willOpen));
+      menuButton.setAttribute('aria-label', willOpen ? 'Close navigation menu' : 'Open navigation menu');
+    });
+
+    panel.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => closeMenu()));
+    document.addEventListener('mcn:donation-open', () => closeMenu());
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !panel.classList.contains('open')) return;
+      if (document.querySelector('#mcn-donation-dialog[open]')) return;
+      closeMenu(true);
+    });
+
+    let scrollTicking = false;
+    const updateScrolledState = () => {
+      const threshold = topbar?.offsetHeight || 0;
+      header.toggleAttribute('data-scrolled', window.scrollY >= Math.max(threshold, 1));
+      scrollTicking = false;
+    };
+    const scheduleScrolledState = () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(updateScrolledState);
+    };
+
+    updateScrolledState();
+    window.addEventListener('scroll', scheduleScrolledState, { passive: true });
+  }
 </script>
+
+<style>
+  .site-header {
+    --utility-height: 40px;
+    --nav-height: 54px;
+    position: sticky;
+    z-index: 500;
+    top: calc(var(--utility-height) * -1);
+    width: 100%;
+    color: #fff;
+  }
+
+  .topbar {
+    height: var(--utility-height);
+    padding: 0;
+    background: var(--lavender);
+    color: var(--ink);
+    font-size: 12px;
+  }
+
+  .utility-inner,
+  .navbar {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 112px;
+  }
+
+  .utility-inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .utility-phone,
+  .utility-right,
+  .topbar-social {
+    display: flex;
+    align-items: center;
+  }
+
+  .utility-phone {
+    gap: 7px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .utility-phone span {
+    color: var(--ink);
+  }
+
+  .utility-phone svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .utility-right {
+    gap: 10px;
+  }
+
+  .topbar-location {
+    order: initial;
+    white-space: nowrap;
+  }
+
+  .topbar-social {
+    gap: 5px;
+    margin: 0;
+  }
+
+  .topbar-social a {
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .topbar-social svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+  }
+
+  .nav-shell {
+    position: relative;
+    height: auto;
+    min-height: calc(var(--nav-height) + 16px);
+    padding-block: 8px;
+    background: var(--navy);
+    box-shadow: 0 0 0 rgba(12, 6, 30, 0);
+    transition: background-color 220ms ease, box-shadow 220ms ease, backdrop-filter 220ms ease;
+  }
+
+  .site-header[data-scrolled] .nav-shell {
+    background: rgba(40, 21, 100, .84);
+    box-shadow: 0 8px 24px rgba(12, 6, 30, .18);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .navbar {
+    position: relative;
+    height: 100%;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+  }
+
+  .brand img {
+    width: 42px;
+    height: 42px;
+    flex: none;
+    object-fit: contain;
+  }
+
+  .brand span {
+    display: grid;
+    line-height: 14px;
+  }
+
+  .brand strong,
+  .brand small {
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0;
+  }
+
+  .brand strong {
+    font-weight: 400;
+  }
+
+  .brand small {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .site-nav-panel {
+    display: contents;
+  }
+
+  .site-nav {
+    position: static;
+    width: auto;
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 26px;
+    padding: 0;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .site-nav a {
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    padding: 0;
+  }
+
+  .site-nav a.active {
+    color: var(--gold);
+  }
+
+  .give-control {
+    min-width: 62px;
+    min-height: 44px;
+    margin: 0;
+    padding: 0 16px;
+    justify-self: end;
+    border: 0;
+    border-radius: 9px;
+    background: var(--lavender);
+    color: var(--red);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .menu-toggle {
+    display: none;
+    border: 0;
+    background: transparent;
+    color: #fff;
+  }
+
+  .site-header a:focus-visible,
+  .site-header button:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 810px) and (max-width: 1300px) {
+    .utility-inner,
+    .navbar {
+      padding-inline: clamp(48px, 7.6vw, 78px);
+    }
+  }
+
+  @media (max-width: 809.98px) {
+    .site-header {
+      --utility-height: 0px;
+      --nav-height: 54px;
+      top: 0;
+    }
+
+    .topbar {
+      display: none;
+    }
+
+    .nav-shell {
+      min-height: calc(var(--nav-height) + 12px);
+      padding-block: 6px;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      padding-inline: 16px;
+    }
+
+    .brand img {
+      width: 38px;
+      height: 38px;
+    }
+
+    .brand strong,
+    .brand small {
+      font-size: 10px;
+      line-height: 12px;
+    }
+
+    .menu-toggle {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      padding: 10px;
+      place-content: center;
+      gap: 4px;
+    }
+
+    .menu-toggle::before {
+      content: none;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .menu-toggle b {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+
+    .menu-toggle[aria-expanded='true'] span:first-child {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .menu-toggle[aria-expanded='true'] span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle[aria-expanded='true'] span:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+
+    .site-nav-panel {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      display: none;
+      padding: 16px 20px 22px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      background: rgba(12, 6, 30, .97);
+      box-shadow: 0 18px 30px rgba(12, 6, 30, .28);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .site-nav-panel.open {
+      display: flex;
+    }
+
+    .site-nav {
+      position: static;
+      width: 100%;
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
+      gap: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    .site-nav a {
+      height: auto;
+      min-height: 44px;
+      padding: 10px 0;
+    }
+
+    .give-control {
+      width: 100%;
+      min-height: 46px;
+      align-self: stretch;
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .brand span {
+      max-width: 190px;
+    }
+
+    .brand strong,
+    .brand small {
+      font-size: 9px;
+      line-height: 11px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-shell,
+    .menu-toggle span {
+      transition: none;
+    }
+  }
+</style>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { eventImages, images, site } from '../data/site';
+import EventCarousel from '../components/EventCarousel.astro';
+import { eventImages, images, site, upcomingEvents } from '../data/site';
 const features = [
   { title: 'OUR HISTORY', href: '/about', image: images.historyCard, copy: 'Rooted in Wesleyan foundations since 1956, we are a church committed to bringing the whole Gospel to the whole world.' },
   { title: 'FELLOWSHIPS', href: '/fellowships', image: images.fellowshipCard, copy: 'Grow in your faith alongside others through our Men, Women, and Youth Fellowships designed for deep spiritual connection and support.' },
@@ -9,9 +10,31 @@ const features = [
 ---
 <BaseLayout title="Home" description="Methodist Church Nigeria at 67 Udo Umana Street, Uyo—a mission-driven family rooted in Wesleyan heritage and committed to the whole Gospel." image={images.homeHero}>
   <section class="home-hero" style={`--home-image:url('${images.homeHero}')`}><div class="container home-hero-content"><h1>Methodist Church Nigeria, 67 Udo Umana</h1><p>Rooted in the Wesleyan heritage and driven by the Holy Spirit, taking the whole Gospel to the whole world.</p><a class="follow-link" href={site.facebook} target="_blank" rel="noreferrer">FOLLOW US</a></div></section>
-  <section class="event-gallery" aria-label="Church event gallery"><div class="event-track">{eventImages.map((src, index) => <img src={src} alt={`Methodist Church Nigeria event ${index + 1}`} width="472" height="408" loading={index < 3 ? 'eager' : 'lazy'} />)}</div></section>
+  <section class="event-gallery" aria-label="Church event gallery — focus to pause motion" tabindex="0">
+    <div class="event-track">
+      {[false, true].map((duplicate) => (
+        <div class="event-sequence" aria-hidden={duplicate ? 'true' : undefined}>
+          {eventImages.map((src, index) => (
+            <img
+              src={src}
+              alt={duplicate ? '' : `Methodist Church Nigeria event ${index + 1}`}
+              width="472"
+              height="408"
+              loading={!duplicate && index < 3 ? 'eager' : 'lazy'}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  </section>
   <section id="service-times" class="service-section"><div class="container service-layout"><div class="service-intro"><h2>Service Times</h2><p>Your seat is saved. Join us this Sunday for a powerful encounter with the Holy Spirit. Come exactly as you are, we’ve been waiting for you.</p></div><div class="service-items"><div><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-5.3 7-12A7 7 0 0 0 5 9c0 6.7 7 12 7 12Z"/><circle cx="12" cy="9" r="2.4"/></svg><div><h3>IN-PERSON</h3><p>Sundays: <strong>7:30AM | 10AM</strong></p></div></div><div><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 10 4-2v8l-4-2Z"/></svg><div><h3>ONLINE</h3><p>Sundays: <strong>7:30AM | 10AM</strong></p></div></div><div><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-5.3 7-12A7 7 0 0 0 5 9c0 6.7 7 12 7 12Z"/><circle cx="12" cy="9" r="2.4"/></svg><div><h3>ADDRESS</h3><p><strong>67 Udo Umana St, Uyo, AKS.</strong></p></div></div></div></div></section>
-  <section class="upcoming"><div class="container"><h2>UPCOMING EVENTS</h2><p>Be part of our upcoming events, save the date.</p><div class="upcoming-artwork"><img src={images.upcomingEvent} alt="Methodist Church Nigeria upcoming events and weekly activities" width="2804" height="2264" loading="lazy" /></div></div></section>
+  <section class="upcoming" aria-labelledby="upcoming-events-title">
+    <div class="container">
+      <h2 id="upcoming-events-title">UPCOMING EVENTS</h2>
+      <p>Be part of our upcoming events, save the date.</p>
+      <EventCarousel events={upcomingEvents} />
+    </div>
+  </section>
   <section class="learn-section"><div class="container learn-layout"><h2>LEARN MORE ABOUT OUR CHURCH</h2><p>From a humble start in 1956 to the Uyo Circuit Headquarters today. We are a mission-driven family anchored in our Wesleyan heritage and committed to reaching the world for Christ.</p></div></section>
   <section class="feature-section"><div class="container home-features">{features.map((feature) => <a class="home-feature" href={feature.href}><img src={feature.image} alt="" width="700" height="525" loading="lazy" /><div><h2>{feature.title}</h2><p>{feature.copy}</p><span>LEARN MORE &gt;</span></div></a>)}</div></section>
 </BaseLayout>
