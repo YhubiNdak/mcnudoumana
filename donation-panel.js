@@ -1,5 +1,8 @@
 (() => {
-  const accountNumber = "34184792093";
+  const donation = window.MCN_DONATION || {};
+  const bankName = donation.bankName || "First Bank Nigeria";
+  const accountName = donation.accountName || "MCN 67, Udo Umana";
+  const accountNumber = donation.accountNumber || "34184792093";
   const dialogId = "mcn-donation-dialog";
   let lastTrigger = null;
 
@@ -7,18 +10,18 @@
     #${dialogId} { border: 0; padding: 0; width: min(680px, calc(100vw - 32px)); max-width: none; max-height: min(780px, calc(100dvh - 32px)); overflow: auto; border-radius: 22px; background: #fff; color: #121212; box-shadow: 0 24px 80px rgba(0,0,0,.35); }
     #${dialogId}::backdrop { background: rgba(12, 6, 30, .68); backdrop-filter: blur(3px); }
     #${dialogId} .mcn-donation-card { position: relative; padding: 30px; text-align: center; font-family: Sora, Arial, sans-serif; }
-    #${dialogId} .mcn-donation-close { position: absolute; top: 14px; right: 14px; display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #eee; color: #171717; font-size: 25px; line-height: 1; cursor: pointer; }
+    #${dialogId} .mcn-donation-close { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #eee; color: #171717; font-size: 25px; line-height: 1; cursor: pointer; }
     #${dialogId} .mcn-donation-logo { width: 58px; height: 58px; object-fit: contain; margin: 0 auto 6px; }
     #${dialogId} h2 { margin: 0; font-size: 19px; line-height: 1.2; font-weight: 800; text-transform: uppercase; }
     #${dialogId} .mcn-donation-intro { max-width: 580px; margin: 7px auto 20px; font-size: 17px; line-height: 1.45; }
     #${dialogId} .mcn-donation-bank { padding: 19px 20px 20px; background: #0c0c0c; color: #fff; }
     #${dialogId} .mcn-donation-bank p { margin: 0; font-size: 16px; line-height: 1.38; }
     #${dialogId} .mcn-donation-label { margin-top: 13px !important; color: #d9d9d9; font-size: 13px !important; font-weight: 800; letter-spacing: .08em; }
-    #${dialogId} .mcn-donation-number { margin: 0 0 13px; color: #fff; font-size: clamp(34px, 6vw, 48px); font-weight: 800; letter-spacing: .02em; line-height: 1; }
-    #${dialogId} .mcn-donation-copy { border: 0; padding: 10px 28px; background: #c29d59; color: #171717; font-size: 16px; font-weight: 700; cursor: pointer; }
+    #${dialogId} .mcn-donation-number { margin: 0 0 13px; color: #fff; font-size: clamp(22px, 8vw, 48px); font-weight: 800; letter-spacing: .02em; line-height: 1.1; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+    #${dialogId} .mcn-donation-copy { min-height: 44px; border: 0; padding: 10px 28px; background: #c29d59; color: #171717; font-size: 16px; font-weight: 700; cursor: pointer; }
     #${dialogId} .mcn-donation-note { display: flex; align-items: flex-start; justify-content: center; gap: 11px; margin: 20px 0; padding: 18px; border: 1px solid #dfd6c3; background: #f4f0e8; font-size: 16px; line-height: 1.45; }
     #${dialogId} .mcn-donation-note-icon { display: grid; place-items: center; flex: 0 0 21px; width: 21px; height: 21px; border-radius: 50%; background: #151515; color: #fff; font-size: 13px; font-weight: 800; }
-    #${dialogId} .mcn-donation-done { border: 0; padding: 16px 25px; background: #dc3525; color: #fff; box-shadow: 0 10px 20px rgba(220,53,37,.25); font-size: 16px; font-weight: 800; cursor: pointer; }
+    #${dialogId} .mcn-donation-done { min-height: 48px; border: 0; padding: 14px 25px; background: #dc3525; color: #fff; box-shadow: 0 10px 20px rgba(220,53,37,.25); font-size: 16px; font-weight: 800; cursor: pointer; }
     #${dialogId} .mcn-donation-status { min-height: 21px; margin: 10px 0 0; color: #315f2b; font-size: 14px; font-weight: 600; }
     @media (max-width: 560px) { #${dialogId} { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); border-radius: 18px; } #${dialogId} .mcn-donation-card { padding: 28px 16px 22px; } #${dialogId} .mcn-donation-intro { font-size: 15px; } #${dialogId} .mcn-donation-bank { padding: 18px 12px; } #${dialogId} .mcn-donation-bank p, #${dialogId} .mcn-donation-note { font-size: 14px; } }
   `;
@@ -39,8 +42,8 @@
         <h2 id="mcn-donation-title">Support the Mission</h2>
         <p class="mcn-donation-intro">Your generosity fuels our mission to take the whole Gospel to the whole world through evangelism and kingdom projects.</p>
         <section class="mcn-donation-bank" aria-label="Bank transfer details">
-          <p>Bank Name: <strong>First Bank Nigeria</strong></p>
-          <p>Account Name: <strong>MCN 67, Udo Umana</strong></p>
+          <p>Bank Name: <strong>${bankName}</strong></p>
+          <p>Account Name: <strong>${accountName}</strong></p>
           <p class="mcn-donation-label">ACCOUNT NUMBER</p>
           <p class="mcn-donation-number">${accountNumber}</p>
           <button class="mcn-donation-copy" type="button">Copy</button>
@@ -82,39 +85,104 @@
     dialog.querySelector(".mcn-donation-close").focus();
   }
 
+  const giveNameSelector = '[data-framer-name="GIVE" i]';
+  const giveButtonSelector = '[data-framer-name="BTN"]';
+  const interactiveSelector = [
+    giveButtonSelector,
+    "a",
+    "button",
+    '[role="button"]',
+    '[data-highlight="true"]',
+    "[tabindex]",
+  ].join(",");
+  const menuControlSelector = [
+    ":is(#overlay, #template-overlay, .framer-jcswC)",
+    ':is(a, button, [role="button"], [data-highlight="true"], [tabindex])',
+  ].join(" ");
+
+  function isExactGiveLabel(element) {
+    return element?.textContent?.replace(/\s+/g, " ").trim().toUpperCase() === "GIVE";
+  }
+
   function findGiveTrigger(target) {
-    const label = target.closest?.('[data-framer-name="GIVE"]');
-    return label?.closest('[data-framer-name="BTN"]') || null;
+    if (!(target instanceof Element)) return null;
+
+    // Include the whole Framer button, not only clicks directly on its text.
+    const namedButton = target.closest(giveButtonSelector);
+    if (namedButton?.querySelector(giveNameSelector)) return namedButton;
+
+    // Support mobile menu clones that preserve the GIVE layer but not BTN.
+    const namedLabel = target.closest(giveNameSelector);
+    if (namedLabel) return namedLabel.closest(interactiveSelector) || namedLabel;
+
+    // Runtime menu portals are not present in the exported HTML. Match only an
+    // exact GIVE control inside the navbar or Framer's overlay mounts.
+    const menuControl = target.closest(menuControlSelector);
+    return isExactGiveLabel(menuControl) ? menuControl : null;
+  }
+
+  function decorateGiveTrigger(trigger) {
+    if (!trigger || trigger.dataset.donationBound === "true") return;
+
+    trigger.dataset.donationBound = "true";
+    if (!trigger.matches("a, button, input")) {
+      trigger.setAttribute("role", "button");
+      if (!trigger.hasAttribute("tabindex")) trigger.tabIndex = 0;
+    }
+    trigger.setAttribute("aria-haspopup", "dialog");
+    trigger.setAttribute("aria-label", "Give to support the mission");
   }
 
   function bindGiveTriggers() {
-    document.querySelectorAll('[data-framer-name="GIVE"]').forEach((label) => {
-      const trigger = label.closest('[data-framer-name="BTN"]');
-      if (!trigger) return;
-      trigger.dataset.donationBound = "true";
-      trigger.setAttribute("role", "button");
-      trigger.setAttribute("aria-haspopup", "dialog");
-      trigger.setAttribute("aria-label", "Give to support the mission");
+    const triggers = new Set();
+
+    document.querySelectorAll(giveNameSelector).forEach((label) => {
+      triggers.add(label.closest(interactiveSelector) || label);
     });
+
+    document.querySelectorAll(giveButtonSelector).forEach((button) => {
+      if (button.querySelector(giveNameSelector)) triggers.add(button);
+    });
+
+    document.querySelectorAll(menuControlSelector).forEach((control) => {
+      if (isExactGiveLabel(control)) triggers.add(control);
+    });
+
+    triggers.forEach(decorateGiveTrigger);
   }
 
-  document.addEventListener("click", (event) => {
+  function handleGiveClick(event) {
     const trigger = findGiveTrigger(event.target);
     if (!trigger) return;
-    event.preventDefault();
-    openDialog(trigger);
-  });
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    const trigger = findGiveTrigger(event.target) || event.target.closest?.('[data-framer-name="BTN"]');
-    if (!trigger?.querySelector('[data-framer-name="GIVE"]')) return;
     event.preventDefault();
+    event.stopImmediatePropagation();
+    decorateGiveTrigger(trigger);
     openDialog(trigger);
-  });
+  }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bindGiveTriggers, { once: true });
-  else bindGiveTriggers();
+  function handleGiveKeydown(event) {
+    if ((event.key !== "Enter" && event.key !== " ") || event.repeat) return;
+
+    const trigger = findGiveTrigger(event.target);
+    if (!trigger) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    decorateGiveTrigger(trigger);
+    openDialog(trigger);
+  }
+
+  // Capture runs before Framer's menu handlers can stop propagation or unmount
+  // the runtime menu clone. This delegate also covers future hydrated nodes.
+  document.addEventListener("click", handleGiveClick, { capture: true });
+  document.addEventListener("keydown", handleGiveKeydown, { capture: true });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindGiveTriggers, { once: true });
+  } else {
+    bindGiveTriggers();
+  }
 
   new MutationObserver(bindGiveTriggers).observe(document.documentElement, {
     childList: true,
