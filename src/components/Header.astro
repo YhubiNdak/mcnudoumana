@@ -63,27 +63,39 @@ const isActive = (href: string) =>
   const topbar = header?.querySelector<HTMLElement>('.topbar');
 
   if (header && menuButton && panel) {
+    const setMenuOpen = (open: boolean, restoreFocus = false) => {
+      panel.classList.toggle('open', open);
+      menuButton.setAttribute('aria-expanded', String(open));
+      menuButton.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+      document.documentElement.classList.toggle('mobile-menu-open', open);
+      document.body.classList.toggle('mobile-menu-open', open);
+      if (!open && restoreFocus) menuButton.focus();
+    };
+
     const closeMenu = (restoreFocus = false) => {
       if (!panel.classList.contains('open')) return;
-      menuButton.setAttribute('aria-expanded', 'false');
-      menuButton.setAttribute('aria-label', 'Open navigation menu');
-      panel.classList.remove('open');
-      if (restoreFocus) menuButton.focus();
+      setMenuOpen(false, restoreFocus);
     };
 
     menuButton.addEventListener('click', () => {
-      const willOpen = !panel.classList.contains('open');
-      panel.classList.toggle('open', willOpen);
-      menuButton.setAttribute('aria-expanded', String(willOpen));
-      menuButton.setAttribute('aria-label', willOpen ? 'Close navigation menu' : 'Open navigation menu');
+      setMenuOpen(!panel.classList.contains('open'));
     });
 
     panel.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => closeMenu()));
     document.addEventListener('mcn:donation-open', () => closeMenu());
+    document.addEventListener('pointerdown', (event) => {
+      if (!panel.classList.contains('open') || header.contains(event.target as Node)) return;
+      closeMenu();
+    });
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape' || !panel.classList.contains('open')) return;
       if (document.querySelector('#mcn-donation-dialog[open]')) return;
       closeMenu(true);
+    });
+
+    const desktopNavigation = window.matchMedia('(min-width: 810px)');
+    desktopNavigation.addEventListener('change', (event) => {
+      if (event.matches) closeMenu();
     });
 
     let scrollTicking = false;
@@ -317,6 +329,12 @@ const isActive = (href: string) =>
     }
   }
 
+  :global(html.mobile-menu-open),
+  :global(body.mobile-menu-open) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
   @media (max-width: 809.98px) {
     .site-header {
       --utility-height: 0px;
@@ -329,14 +347,17 @@ const isActive = (href: string) =>
     }
 
     .nav-shell {
-      min-height: calc(var(--nav-height) + 12px);
+      height: 66px;
+      min-height: 66px;
       padding-block: 6px;
     }
 
     .navbar {
+      height: 54px;
       display: flex;
       justify-content: space-between;
-      padding-inline: 16px;
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
     }
 
     .brand img {
@@ -398,10 +419,16 @@ const isActive = (href: string) =>
       right: 0;
       left: 0;
       display: none;
-      padding: 16px 20px 22px;
+      max-height: calc(100dvh - 66px);
+      padding-top: 16px;
+      padding-right: max(20px, env(safe-area-inset-right));
+      padding-bottom: max(22px, env(safe-area-inset-bottom));
+      padding-left: max(20px, env(safe-area-inset-left));
       flex-direction: column;
       align-items: stretch;
       gap: 12px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
       background: rgba(12, 6, 30, .97);
       box-shadow: 0 18px 30px rgba(12, 6, 30, .28);
       backdrop-filter: blur(16px);
@@ -437,15 +464,22 @@ const isActive = (href: string) =>
     }
   }
 
-  @media (max-width: 420px) {
+  @media (max-width: 480px) {
     .brand span {
-      max-width: 190px;
+      display: none;
+    }
+  }
+
+  @media (max-height: 420px) and (orientation: landscape) {
+    .site-nav-panel {
+      gap: 6px;
+      padding-top: 8px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
     }
 
-    .brand strong,
-    .brand small {
-      font-size: 9px;
-      line-height: 11px;
+    .site-nav a {
+      min-height: 40px;
+      padding-block: 6px;
     }
   }
 

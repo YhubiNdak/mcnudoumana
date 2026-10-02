@@ -25,7 +25,26 @@
     #${dialogId} .mcn-donation-done { min-height: 48px; border: 0; padding: 14px 25px; background: #dc3525; color: #fff; box-shadow: 0 10px 20px rgba(220,53,37,.25); font-size: 16px; font-weight: 800; cursor: pointer; }
     #${dialogId} .mcn-donation-status { min-height: 21px; margin: 10px 0 0; color: #315f2b; font-size: 14px; font-weight: 600; }
     #${dialogId} :focus-visible { outline: 3px solid #c29d59; outline-offset: 3px; }
-    @media (max-width: 560px) { #${dialogId} { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); border-radius: 18px; } #${dialogId} .mcn-donation-card { padding: 28px 16px 22px; } #${dialogId} .mcn-donation-intro { font-size: 15px; } #${dialogId} .mcn-donation-bank { padding: 18px 12px; } #${dialogId} .mcn-donation-bank p, #${dialogId} .mcn-donation-note { font-size: 14px; } }
+    html:has(#${dialogId}[open]), body:has(#${dialogId}[open]) { overflow: hidden; overscroll-behavior: none; }
+    @media (max-width: 600px) {
+      #${dialogId} {
+        width: calc(100vw - max(24px, calc(env(safe-area-inset-left) + env(safe-area-inset-right) + 16px)));
+        max-height: calc(100dvh - max(24px, calc(env(safe-area-inset-top) + env(safe-area-inset-bottom) + 16px)));
+        border-radius: 18px;
+      }
+      #${dialogId} .mcn-donation-card { padding: 28px 16px 22px; }
+      #${dialogId} .mcn-donation-intro { font-size: 15px; }
+      #${dialogId} .mcn-donation-bank { padding: 18px 12px; }
+      #${dialogId} .mcn-donation-bank p,
+      #${dialogId} .mcn-donation-note { font-size: 14px; }
+      #${dialogId} .mcn-donation-done { width: 100%; padding-inline: 12px; line-height: 1.3; }
+    }
+    @media (max-height: 500px) and (orientation: landscape) {
+      #${dialogId} .mcn-donation-card { padding-block: 18px; }
+      #${dialogId} .mcn-donation-logo { width: 44px; height: 44px; }
+      #${dialogId} .mcn-donation-intro { margin-bottom: 12px; }
+      #${dialogId} .mcn-donation-note { margin-block: 12px; padding: 12px; }
+    }
   `;
 
   function copyAccountNumber() {

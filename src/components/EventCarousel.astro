@@ -391,6 +391,43 @@ const { events } = Astro.props;
     }
   }
 
+  @media (max-width: 809.98px) {
+    .carousel-dots {
+      gap: 0;
+    }
+
+    .carousel-dots button {
+      width: 44px;
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .event-carousel-viewport {
+      aspect-ratio: 1 / 1;
+    }
+
+    .carousel-previous {
+      left: 6px;
+    }
+
+    .carousel-next {
+      right: 6px;
+    }
+
+    .carousel-toggle {
+      right: 6px;
+      bottom: 6px;
+      left: auto;
+      padding-inline: 10px;
+    }
+
+    .carousel-dots {
+      bottom: 6px;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .event-slide,
     .event-carousel-controls {

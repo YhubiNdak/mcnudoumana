@@ -277,6 +277,56 @@ const detailImage = fellowship.detailImage ?? fellowship.cardImage;
     }
   }
 
+  .detail-heading h2 {
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  .detail-heading a {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .detail-copy .text-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  @media (max-width: 809.98px) {
+    .detail-section {
+      padding-top: max(14px, env(safe-area-inset-top));
+      padding-right: max(14px, env(safe-area-inset-right));
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+      padding-left: max(14px, env(safe-area-inset-left));
+    }
+
+    .detail-body {
+      scrollbar-gutter: auto;
+    }
+  }
+
+  @media (max-height: 500px) and (orientation: landscape) {
+    .detail-heading {
+      padding: 12px 16px 8px;
+    }
+
+    .detail-heading h2 {
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .detail-body {
+      padding: 0 16px 16px;
+    }
+
+    .detail-body > img {
+      height: min(220px, 34dvh);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .detail-section {
       scroll-behavior: auto;
