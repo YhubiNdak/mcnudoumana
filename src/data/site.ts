@@ -23,7 +23,7 @@ export const images = {
 
 export const upcomingEvents = [
   {
-    src: image('40EW8Iz7g9VHoc7bLbZtJme7M.png?width=1280&height=853'),
+    src: image('y4GdozmNGwzxyTy3FxwLOsfQBI.png?width=2804&height=2264'),
     width: 1280,
     height: 853,
     title: 'Bible Study',

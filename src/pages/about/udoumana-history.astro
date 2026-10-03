@@ -7,5 +7,24 @@ import { images } from '../../data/site';
 <BaseLayout title="Udo Umana History" description="Trace the story of Methodist Church Nigeria, Udo Umana, from a five-person Easter fellowship in 1956 to Uyo Circuit Headquarters." image={images.aboutHero}>
   <PageHero title="About Us: Methodist Church Nigeria, Udo Umana" breadcrumb="About" image={images.aboutHero} />
   <nav class="about-tabs" aria-label="About pages"><a href="/about">About Us</a><a class="active" href="/about/udoumana-history" aria-current="page">Udo Umana History</a></nav>
-  <section class="history-flow"><div class="container history-columns">{historySections.map((section) => <article class="history-section"><p class="history-number">{section.numeral}</p><h2>{section.title}</h2><h3>{section.subtitle}</h3>{section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}{section.list && <ul>{section.list.map((item) => <li>{item}</li>)}</ul>}{section.milestones?.map((milestone) => <p><strong>{milestone.year}:</strong> {milestone.text}</p>)}</article>)}</div></section>
+  <section class="history-flow">
+    <div class="container">
+      <div class="history-columns">
+        {historySections.map((section) => (
+          <article class="history-section">
+            <p class="history-number">{section.numeral}</p>
+            <h2>{section.title}</h2>
+            <h3>{section.subtitle}</h3>
+            {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            {section.list && <ul>{section.list.map((item) => <li>{item}</li>)}</ul>}
+            {section.milestones?.map((milestone) => <p><strong>{milestone.year}:</strong> {milestone.text}</p>)}
+          </article>
+        ))}
+      </div>
+      <figure class="history-leaders">
+        <img src="/4_123520.jpeg" alt="Leaders of Methodist Church Nigeria, Udo Umana, gathered outside the church" width="1102" height="646" loading="lazy" decoding="async" />
+        <figcaption>Cross section of Leaders for the Year 2000</figcaption>
+      </figure>
+    </div>
+  </section>
 </BaseLayout>

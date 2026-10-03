@@ -557,3 +557,90 @@ body {
 .values-list p strong {
   color: var(--ink);
 }
+
+/* About and History content photography. */
+.about-media,
+.about-values-media figure,
+.history-leaders {
+  min-width: 0;
+  margin: 0;
+}
+
+.about-experience-media {
+  min-height: 0;
+  overflow: hidden;
+  background: var(--navy);
+}
+
+.about-experience-media img {
+  width: 100%;
+  height: 425px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.about-values-media figure {
+  overflow: hidden;
+  background: var(--navy);
+}
+
+.about-values-media img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.history-leaders {
+  width: min(100%, 1102px);
+  margin: 72px auto 0;
+}
+
+.history-leaders img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1102 / 646;
+  object-fit: cover;
+}
+
+.history-leaders figcaption {
+  margin-top: 10px;
+  color: var(--grey);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 809.98px) {
+  .about-experience-media {
+    margin-block: 32px;
+  }
+
+  .about-experience-media img {
+    height: clamp(180px, 65vw, 260px);
+  }
+
+  .about-values-media img {
+    height: clamp(150px, 45vw, 220px);
+  }
+
+  .history-leaders {
+    margin-top: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-values-media {
+    grid-template-columns: 1fr;
+  }
+
+  .about-values-media img {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .history-leaders figcaption {
+    font-size: 13px;
+    text-align: left;
+  }
+}
