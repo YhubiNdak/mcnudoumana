@@ -644,3 +644,8 @@ body {
     text-align: left;
   }
 }
+
+/* Center the Weekly Activities introduction over its carousel. */
+.upcoming > .container {
+  text-align: center;
+}
