@@ -645,7 +645,7 @@ body {
   }
 }
 
-/* Center the Weekly Activities introduction over its carousel. */
+/* Align the Weekly Activities introduction with other section copy. */
 .upcoming > .container {
-  text-align: center;
+  text-align: left;
 }

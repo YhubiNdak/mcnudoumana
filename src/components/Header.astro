@@ -63,12 +63,32 @@ const isActive = (href: string) =>
   const topbar = header?.querySelector<HTMLElement>('.topbar');
 
   if (header && menuButton && panel) {
+    let lockedScrollY = 0;
+
+    const lockPage = () => {
+      lockedScrollY = window.scrollY;
+      document.body.style.setProperty('--menu-scroll-offset', `-${lockedScrollY}px`);
+      document.documentElement.classList.add('mobile-menu-open');
+      document.body.classList.add('mobile-menu-open');
+    };
+
+    const unlockPage = () => {
+      document.documentElement.classList.remove('mobile-menu-open');
+      document.body.classList.remove('mobile-menu-open');
+      document.body.style.removeProperty('--menu-scroll-offset');
+
+      const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo(0, lockedScrollY);
+      document.documentElement.style.scrollBehavior = previousScrollBehavior;
+    };
+
     const setMenuOpen = (open: boolean, restoreFocus = false) => {
+      if (open) lockPage();
       panel.classList.toggle('open', open);
       menuButton.setAttribute('aria-expanded', String(open));
       menuButton.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
-      document.documentElement.classList.toggle('mobile-menu-open', open);
-      document.body.classList.toggle('mobile-menu-open', open);
+      if (!open) unlockPage();
       if (!open && restoreFocus) menuButton.focus();
     };
 
@@ -329,10 +349,28 @@ const isActive = (href: string) =>
     }
   }
 
-  :global(html.mobile-menu-open),
-  :global(body.mobile-menu-open) {
+  :global(html.mobile-menu-open) {
     overflow: hidden;
     overscroll-behavior: none;
+  }
+
+  :global(body.mobile-menu-open) {
+    position: fixed;
+    top: var(--menu-scroll-offset, 0);
+    right: 0;
+    left: 0;
+    width: 100%;
+    padding-top: 66px;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  :global(html.mobile-menu-open) .site-header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
   }
 
   @media (max-width: 809.98px) {
@@ -414,8 +452,8 @@ const isActive = (href: string) =>
     }
 
     .site-nav-panel {
-      position: absolute;
-      top: 100%;
+      position: fixed;
+      top: 66px;
       right: 0;
       left: 0;
       display: none;
@@ -465,8 +503,19 @@ const isActive = (href: string) =>
   }
 
   @media (max-width: 480px) {
+    .brand {
+      min-width: 0;
+    }
+
     .brand span {
-      display: none;
+      display: grid;
+      min-width: 0;
+      max-width: 190px;
+    }
+
+    .brand strong,
+    .brand small {
+      white-space: nowrap;
     }
   }
 
