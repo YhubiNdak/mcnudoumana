@@ -10,13 +10,19 @@ Astro static website for Methodist Church Nigeria, 67 Udo Umana Street, Uyo. The
 ## Commands
 
 ```sh
-npm ci          # install the exact locked dependency tree
-npm run dev     # start the local development server
-npm run build   # generate the production site in dist/
-npm run preview # preview the production build
+npm ci                  # install the exact locked dependency tree
+npm run dev             # start the local development server
+npm run build           # generate the production site in dist/
+npm run preview         # preview the Astro production build
+npm run deploy          # build and deploy to Cloudflare Workers
+npm run deploy:preview  # build and update the current branch Preview
 ```
 
-Vercel should use build command `npm run build` and output directory `dist`. `vercel.json` keeps extensionless URLs, disables trailing slashes, and applies immutable caching to static assets.
+## Deployment
+
+`wrangler.jsonc` configures this Astro SSG as a Cloudflare Worker with static assets from `dist/`. Wrangler runs `npm run build`, serves the generated `404.html` for missing routes, and keeps canonical URLs free of trailing slashes.
+
+For Cloudflare Workers Builds, use `npx wrangler deploy` for production and `npx wrangler preview` for branch previews. The required Preview configuration is checked into the repository. Vercel remains supported with build command `npm run build` and output directory `dist`.
 
 ## Project structure
 
