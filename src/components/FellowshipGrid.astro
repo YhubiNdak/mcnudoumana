@@ -1,0 +1,5 @@
+---
+import { fellowships } from '../data/fellowships';
+import FellowshipCard from './FellowshipCard.astro';
+---
+<div class="fellowship-grid">{fellowships.map((fellowship) => <FellowshipCard fellowship={fellowship} />)}</div>

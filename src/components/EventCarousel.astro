@@ -1,0 +1,441 @@
+---
+interface CarouselEvent {
+  src: string;
+  width: number;
+  height: number;
+  title: string;
+  alt: string;
+}
+
+interface Props {
+  events: readonly CarouselEvent[];
+}
+
+const { events } = Astro.props;
+---
+
+{events.length > 0 && (
+  <div
+    class="event-carousel"
+    data-event-carousel
+    role="region"
+    aria-roledescription="carousel"
+    aria-label="Upcoming event flyers"
+  >
+    <p class="sr-only" data-carousel-status aria-live="off" aria-atomic="true">
+      Slide 1 of {events.length}: {events[0].title}
+    </p>
+
+    <div class="event-carousel-viewport">
+      <ul class="event-slides">
+        {events.map((event, index) => (
+          <li
+            class:list={['event-slide', { 'is-active': index === 0 }]}
+            data-carousel-slide
+            data-title={event.title}
+            aria-roledescription="slide"
+            aria-label={`${index + 1} of ${events.length}: ${event.title}`}
+            aria-hidden={index === 0 ? 'false' : 'true'}
+          >
+            <img
+              src={event.src}
+              alt={event.alt}
+              width={event.width}
+              height={event.height}
+              loading="lazy"
+              decoding="async"
+            />
+          </li>
+        ))}
+      </ul>
+
+      {events.length > 1 && (
+        <div class="event-carousel-controls" aria-label="Event carousel controls">
+          <button class="carousel-arrow carousel-previous" type="button" data-carousel-previous aria-label="Show previous event flyer">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button class="carousel-toggle" type="button" data-carousel-toggle aria-label="Pause automatic flyer rotation">
+            <span data-carousel-toggle-label>Pause</span>
+          </button>
+          <div class="carousel-dots" aria-label="Choose an event flyer">
+            {events.map((event, index) => (
+              <button
+                type="button"
+                data-carousel-dot={index}
+                aria-label={`Show ${event.title}`}
+                aria-current={index === 0 ? 'true' : undefined}
+              />
+            ))}
+          </div>
+          <button class="carousel-arrow carousel-next" type="button" data-carousel-next aria-label="Show next event flyer">
+            <span aria-hidden="true">›</span>
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+<script>
+  const ROTATION_DELAYS = [5000, 5000, 7000];
+
+  document.querySelectorAll<HTMLElement>('[data-event-carousel]').forEach((carousel) => {
+    const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-carousel-slide]'));
+    const dots = Array.from(carousel.querySelectorAll<HTMLButtonElement>('[data-carousel-dot]'));
+    const previous = carousel.querySelector<HTMLButtonElement>('[data-carousel-previous]');
+    const next = carousel.querySelector<HTMLButtonElement>('[data-carousel-next]');
+    const toggle = carousel.querySelector<HTMLButtonElement>('[data-carousel-toggle]');
+    const toggleLabel = carousel.querySelector<HTMLElement>('[data-carousel-toggle-label]');
+    const status = carousel.querySelector<HTMLElement>('[data-carousel-status]');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (slides.length < 2 || !previous || !next || !toggle || !toggleLabel || !status) return;
+
+    let activeIndex = 0;
+    let timer: number | undefined;
+    let hovered = false;
+    let userPaused = false;
+    let announcementTimer: number | undefined;
+
+    const clearTimer = () => {
+      if (timer !== undefined) window.clearTimeout(timer);
+      timer = undefined;
+    };
+
+    const canRotate = () =>
+      !userPaused &&
+      !reducedMotion.matches &&
+      !document.hidden &&
+      !hovered &&
+      !carousel.matches(':focus-within');
+
+    const updateToggle = () => {
+      const isPaused = userPaused || reducedMotion.matches;
+      toggleLabel.textContent = isPaused ? 'Play' : 'Pause';
+      toggle.setAttribute(
+        'aria-label',
+        isPaused ? 'Play automatic flyer rotation' : 'Pause automatic flyer rotation'
+      );
+    };
+
+    const show = (requestedIndex: number, announce = false) => {
+      activeIndex = (requestedIndex + slides.length) % slides.length;
+
+      slides.forEach((slide, index) => {
+        const isActive = index === activeIndex;
+        slide.classList.toggle('is-active', isActive);
+        slide.setAttribute('aria-hidden', String(!isActive));
+      });
+
+      dots.forEach((dot, index) => {
+        if (index === activeIndex) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+
+      if (announce) {
+        window.clearTimeout(announcementTimer);
+        status.setAttribute('aria-live', 'polite');
+        status.textContent = `Slide ${activeIndex + 1} of ${slides.length}: ${slides[activeIndex].dataset.title}`;
+        announcementTimer = window.setTimeout(() => status.setAttribute('aria-live', 'off'), 1000);
+      }
+    };
+
+    const schedule = () => {
+      clearTimer();
+      if (!canRotate()) return;
+
+      timer = window.setTimeout(() => {
+        show(activeIndex + 1);
+        schedule();
+      }, ROTATION_DELAYS[activeIndex] ?? 5000);
+    };
+
+    const stopForInteraction = (requestedIndex: number) => {
+      userPaused = true;
+      clearTimer();
+      show(requestedIndex, true);
+      updateToggle();
+    };
+
+    previous.addEventListener('click', () => stopForInteraction(activeIndex - 1));
+    next.addEventListener('click', () => stopForInteraction(activeIndex + 1));
+    dots.forEach((dot, index) => dot.addEventListener('click', () => stopForInteraction(index)));
+
+    toggle.addEventListener('click', () => {
+      userPaused = !userPaused;
+      updateToggle();
+      schedule();
+    });
+
+    carousel.addEventListener('pointerenter', () => {
+      hovered = true;
+      clearTimer();
+    });
+    carousel.addEventListener('pointerleave', () => {
+      hovered = false;
+      schedule();
+    });
+    carousel.addEventListener('focusin', clearTimer);
+    carousel.addEventListener('focusout', () => window.setTimeout(schedule));
+    document.addEventListener('visibilitychange', schedule);
+    reducedMotion.addEventListener('change', () => {
+      updateToggle();
+      schedule();
+    });
+
+    updateToggle();
+    schedule();
+  });
+</script>
+
+<style>
+  .event-carousel {
+    width: 100%;
+    max-width: 849px;
+    margin: 18px auto 0;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .event-carousel-viewport {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: #080510;
+  }
+
+  .event-slides {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .event-slide {
+    grid-area: 1 / 1;
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 500ms ease;
+  }
+
+  .event-slide.is-active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .event-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .event-carousel-controls {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+
+  .event-carousel-controls button {
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid rgba(255, 255, 255, .35);
+    background: rgba(12, 6, 30, .58);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background-color 160ms ease, opacity 160ms ease;
+  }
+
+  .event-carousel-controls button:hover {
+    background: rgba(12, 6, 30, .82);
+  }
+
+  .event-carousel-controls button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    display: grid;
+    width: 44px;
+    padding: 0;
+    place-items: center;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    line-height: 1;
+  }
+
+  .carousel-previous {
+    left: 12px;
+  }
+
+  .carousel-next {
+    right: 12px;
+  }
+
+  .carousel-toggle {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    left: auto;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .carousel-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    display: flex;
+    gap: 4px;
+    padding: 0;
+    transform: translateX(-50%);
+    pointer-events: auto;
+  }
+
+  .carousel-dots button {
+    position: relative;
+    width: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .carousel-dots button:hover {
+    background: transparent;
+  }
+
+  .carousel-dots button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .42);
+    transform: translate(-50%, -50%);
+  }
+
+  .carousel-dots button[aria-current='true']::after {
+    width: 18px;
+    border-color: var(--gold);
+    border-radius: 999px;
+    background: var(--gold);
+  }
+
+  @media (hover: hover) {
+    .event-carousel-controls {
+      opacity: 0;
+    }
+
+    .event-carousel:hover .event-carousel-controls,
+    .event-carousel:focus-within .event-carousel-controls {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .carousel-previous {
+      left: 8px;
+    }
+
+    .carousel-next {
+      right: 8px;
+    }
+
+    .carousel-toggle {
+      right: 8px;
+      bottom: 8px;
+      left: auto;
+      padding-inline: 12px;
+    }
+
+    .carousel-dots {
+      bottom: 8px;
+    }
+  }
+
+  @media (max-width: 809.98px) {
+    .carousel-dots {
+      gap: 0;
+    }
+
+    .carousel-dots button {
+      width: 44px;
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .event-carousel-viewport {
+      aspect-ratio: 1 / 1;
+    }
+
+    .carousel-previous {
+      left: 6px;
+    }
+
+    .carousel-next {
+      right: 6px;
+    }
+
+    .carousel-toggle {
+      right: 6px;
+      bottom: 6px;
+      left: auto;
+      padding-inline: 10px;
+    }
+
+    .carousel-dots {
+      bottom: 6px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .event-slide,
+    .event-carousel-controls {
+      transition: none;
+    }
+
+    .carousel-toggle {
+      display: none;
+    }
+  }
+</style>

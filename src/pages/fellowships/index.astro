@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import FellowshipGrid from '../../components/FellowshipGrid.astro';
+import { images } from '../../data/site';
+---
+<BaseLayout title="Fellowships" description="Find your place to serve, grow and belong through seven fellowships at Methodist Church Nigeria, 67 Udo Umana Street, Uyo." image={images.fellowshipsHero}>
+  <PageHero title="Fellowships: Methodist Church Nigeria, Udo Umana" breadcrumb="Fellowship" image={images.fellowshipsHero} />
+  <section class="fellowships-section"><div class="container"><div class="fellowships-intro"><h2>FELLOWSHIPS</h2><p>Find your place to serve, grow, and belong. Explore our fellowships and discover a community dedicated to spiritual growth and sharing the whole Gospel.</p></div><FellowshipGrid /></div></section>
+</BaseLayout>
