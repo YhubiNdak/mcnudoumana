@@ -3,8 +3,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import { activityColumns } from '../data/activities';
 import { images } from '../data/site';
+
+const weekdayOrder = ['Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
+const activityDays = activityColumns
+  .flat()
+  .sort((first, second) => weekdayOrder.indexOf(first.day) - weekdayOrder.indexOf(second.day));
 ---
 <BaseLayout title="Activities: Beyond Sunday" description="Explore the weekly worship, prayer, Bible study, choir, radio and band activities at Methodist Church Nigeria, 67 Udo Umana Street, Uyo." image={images.activitiesHero}>
   <PageHero title="Activities: Beyond Sunday" breadcrumb="Activities" image={images.activitiesHero} />
-  <section class="activities-section"><div class="container schedule">{activityColumns.map((column) => <div class="schedule-column">{column.map((item) => <article class="day-block"><h2>{item.day}</h2>{item.groups.map((group) => <div class="activity-group"><h3>{group.title}</h3>{group.details && <ul>{group.details.map((detail) => <li>{detail}</li>)}</ul>}</div>)}</article>)}</div>)}</div></section>
+  <section class="activities-section"><div class="container schedule">{activityDays.map((item) => <article class="day-block"><h2>{item.day}</h2>{item.groups.map((group) => <div class="activity-group"><h3>{group.title}</h3>{group.details && <ul>{group.details.map((detail) => <li>{detail}</li>)}</ul>}</div>)}</article>)}</div></section>
 </BaseLayout>

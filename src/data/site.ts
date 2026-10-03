@@ -36,13 +36,6 @@ export const upcomingEvents = [
     title: 'Weekly Activities',
     alt: 'Weekly activities schedule for Methodist Church Nigeria, including Wednesday, Friday Bible Study, and Sunday worship.',
   },
-  {
-    src: image('y4GdozmNGwzxyTy3FxwLOsfQBI.png?width=2804&height=2264'),
-    width: 2804,
-    height: 2264,
-    title: 'Easter Prayer Summit 2026',
-    alt: 'Easter Prayer Summit 2026, themed Mercy and Triumph, at Methodist Church Nigeria, 67 Udo Umana Street.',
-  },
 ] as const;
 
 export const eventImages = [

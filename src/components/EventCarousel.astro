@@ -77,7 +77,7 @@ const { events } = Astro.props;
 )}
 
 <script>
-  const ROTATION_DELAYS = [5000, 5000, 7000];
+  const ROTATION_DELAYS = [5000, 5000];
 
   document.querySelectorAll<HTMLElement>('[data-event-carousel]').forEach((carousel) => {
     const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-carousel-slide]'));
